@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
+    <title>DompetKu - Catatan Keuangan</title>
+
+        <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- Untuk iOS (Safari) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DompetKu">
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- ===== HEADER ===== -->
+        <header class="app-header" id="appHeader">
+            <div class="header-bg" id="headerBg"></div>
+            <div class="header-overlay"></div>
+            <div class="header-content">
+                <div class="user-info">
+                    <div class="user-avatar" id="headerAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-greeting">
+                        <span class="greeting-text" id="greetingText">Selamat Pagi 👋</span>
+                        <h1 class="app-title" id="userDisplayName">DompetKu</h1>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-header" id="calculatorBtn" title="Kalkulator">
+                        <i class="fas fa-calculator"></i>
+                    </button>
+                    <button class="btn-header" id="themeToggle" title="Ganti Tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="balance-label">
+                    <i class="fas fa-wallet"></i>
+                    <span>Saldo Total</span>
+                </div>
+                <div class="balance-main">
+                    <span class="currency" id="currencySymbol">Rp</span>
+                    <span class="balance-amount" id="totalBalance">0</span>
+                </div>
+                <div class="balance-grid">
+                    <div class="balance-item income">
+                        <div class="balance-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="balance-info">
+                            <span class="balance-item-label">Pemasukan</span>
+                            <span class="balance-item-value" id="totalIncome">0</span>
+                        </div>
+                    </div>
+                    <div class="balance-item expense">
+                        <div class="balance-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="balance-info">
+                            <span class="balance-item-label">Pengeluaran</span>
+                            <span class="balance-item-value" id="totalExpense">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- ===== TRANSACTIONS PAGE ===== -->
+            <section class="page active" id="page-transactions">
+                <div class="page-header">
+                    <h2>Transaksi</h2>
+                    <div class="filter-chips">
+                        <button class="chip active" data-filter="all">Semua</button>
+                        <button class="chip" data-filter="income">Masuk</button>
+                        <button class="chip" data-filter="expense">Keluar</button>
+                    </div>
+                </div>
+
+                <!-- Today Stats -->
+                <div class="today-stats" id="todayStats">
+                    <div class="today-stat">
+                        <span class="today-label">Hari Ini</span>
+                        <span class="today-value" id="todaySpending">0</span>
+                    </div>
+                    <div class="today-stat">
+                        <span class="today-label">Rata-rata/Hari</span>
+                        <span class="today-value" id="avgDaily">0</span>
+                    </div>
+                </div>
+
+                <div class="date-filter">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" id="filterDate">
+                    <button class="btn-clear-date" id="clearDateBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="summary-cards">
+                    <div class="summary-card income">
+                        <i class="fas fa-arrow-down"></i>
+                        <div>
+                            <span class="summary-label">Masuk</span>
+                            <span class="summary-value" id="filteredIncome">0</span>
+                        </div>
+                    </div>
+                    <div class="summary-card expense">
+                        <i class="fas fa-arrow-up"></i>
+                        <div>
+                            <span class="summary-label">Keluar</span>
+                            <span class="summary-value" id="filteredExpense">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transactions-container" id="transactionsList"></div>
+            </section>
+
+            <!-- ===== SAVINGS PAGE ===== -->
+            <section class="page" id="page-savings">
+                <div class="page-header">
+                    <h2>Tabungan</h2>
+                    <button class="btn-add-small" id="addSavingsGoalBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div class="savings-overview">
+                    <div class="savings-total-card">
+                        <i class="fas fa-piggy-bank"></i>
+                        <div>
+                            <span>Total Tabungan</span>
+                            <strong id="totalSavings">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="savings-goals-container" id="savingsGoalsList"></div>
+            </section>
+
+            <!-- ===== BUDGET PAGE ===== -->
+            <section class="page" id="page-budget">
+                <div class="page-header">
+                    <h2>Budget</h2>
+                    <button class="btn-add-small" id="addBudgetBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div class="budget-overview" id="budgetOverview">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="budget-list" id="budgetList"></div>
+            </section>
+
+            <!-- ===== REPORTS PAGE ===== -->
+            <section class="page" id="page-reports">
+                <div class="page-header">
+                    <h2>Laporan</h2>
+                </div>
+
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="week">Minggu</button>
+                    <button class="period-btn" data-period="month">Bulan</button>
+                    <button class="period-btn" data-period="year">Tahun</button>
+                    <button class="period-btn" data-period="all">Semua</button>
+                </div>
+
+                <div class="report-summary-cards">
+                    <div class="report-summary-card income">
+                        <div class="report-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="report-info">
+                            <span>Total Pemasukan</span>
+                            <strong id="reportIncome">0</strong>
+                        </div>
+                    </div>
+                    <div class="report-summary-card expense">
+                        <div class="report-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="report-info">
+                            <span>Total Pengeluaran</span>
+                            <strong id="reportExpense">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Pengeluaran per Kategori</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="category-list" id="categoryBreakdown"></div>
+            </section>
+
+            <!-- ===== PROFILE PAGE ===== -->
+            <section class="page" id="page-profile">
+                <div class="page-header">
+                    <h2>Profil & Pengaturan</h2>
+                </div>
+
+                <div class="profile-card" id="profileCard">
+                    <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar" id="profileAvatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <button class="avatar-edit-btn" id="editAvatarBtn">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none">
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="profileNameDisplay">Pengguna DompetKu</h3>
+                        <p id="profileStats">0 transaksi tercatat</p>
+                        <button class="btn-edit-name" id="editNameBtn">
+                            <i class="fas fa-pen"></i> Edit Nama
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-list">
+                    <!-- PENAMPILAN -->
+                    <div class="settings-section">
+                        <h4>Penampilan</h4>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fas fa-moon"></i>
+                                <span>Mode Gelap</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="darkModeToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <button class="setting-btn" id="backgroundBtn">
+                            <i class="fas fa-image"></i>
+                            <span>Ganti Background Header</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- PREFERENSI -->
+                    <div class="settings-section">
+                        <h4>Preferensi</h4>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fas fa-money-bill"></i>
+                                <span>Mata Uang</span>
+                            </div>
+                            <select id="currencySelect" class="setting-select">
+                                <option value="IDR">IDR (Rp)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="MYR">MYR (RM)</option>
+                                <option value="SGD">SGD (S$)</option>
+                                <option value="JPY">JPY (¥)</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fas fa-percent"></i>
+                                <span>Pemisah Ribuan</span>
+                            </div>
+                            <select id="separatorSelect" class="setting-select">
+                                <option value=".">Titik (1.000)</option>
+                                <option value=",">Koma (1,000)</option>
+                                <option value=" ">Spasi (1 000)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- KATEGORI -->
+                    <div class="settings-section">
+                        <h4>Kustomisasi</h4>
+                        <button class="setting-btn" id="manageCategoriesBtn">
+                            <i class="fas fa-tags"></i>
+                            <span>Kelola Kategori</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="setting-btn" id="manageBudgetsBtn">
+                            <i class="fas fa-wallet"></i>
+                            <span>Kelola Budget</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- DATA -->
+                    <div class="settings-section">
+                        <h4>Data</h4>
+                        <button class="setting-btn" id="exportCsvBtn">
+                            <i class="fas fa-file-csv"></i>
+                            <span>Export ke CSV (Excel)</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="setting-btn" id="exportJsonBtn">
+                            <i class="fas fa-download"></i>
+                            <span>Backup Data (JSON)</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="setting-btn" id="importBtn">
+                            <i class="fas fa-upload"></i>
+                            <span>Restore dari Backup</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display:none">
+                    </div>
+
+                    <!-- TENTANG -->
+                    <div class="settings-section">
+                        <h4>Tentang</h4>
+                        <button class="setting-btn" id="aboutBtn">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Tentang Aplikasi</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="setting-btn" id="helpBtn">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Bantuan</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- DANGER ZONE -->
+                    <div class="settings-section danger">
+                        <h4>Zona Berbahaya</h4>
+                        <button class="setting-btn danger" id="resetDataBtn">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Hapus Semua Data</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ===== FLOATING ACTION BUTTON ===== -->
+        <button class="fab" id="fabAdd">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- ===== BOTTOM NAVIGATION ===== -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="transactions">
+                <i class="fas fa-receipt"></i>
+                <span>Transaksi</span>
+            </button>
+            <button class="nav-item" data-page="savings">
+                <i class="fas fa-piggy-bank"></i>
+                <span>Tabungan</span>
+            </button>
+            <button class="nav-item" data-page="budget">
+                <i class="fas fa-wallet"></i>
+                <span>Budget</span>
+            </button>
+            <button class="nav-item" data-page="reports">
+                <i class="fas fa-chart-pie"></i>
+                <span>Laporan</span>
+            </button>
+            <button class="nav-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profil</span>
+            </button>
+        </nav>
+
+        <!-- ===== FAB MENU ===== -->
+        <div class="fab-menu" id="fabMenu">
+            <div class="fab-menu-backdrop"></div>
+            <div class="fab-menu-items">
+                <button class="fab-option income" data-type="income">
+                    <span>Pemasukan</span>
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+                <button class="fab-option expense" data-type="expense">
+                    <span>Pengeluaran</span>
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== TRANSACTION MODAL ===== -->
+        <div class="modal" id="transactionModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3 id="transactionModalTitle">Tambah Transaksi</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="transactionForm" class="modal-body">
+                    <input type="hidden" id="transactionType">
+                    <input type="hidden" id="transactionId">
+
+                    <div class="amount-display">
+                        <span class="amount-currency" id="modalCurrency">Rp</span>
+                        <input type="text" id="amount" class="amount-input" placeholder="0" inputmode="numeric" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label>Kategori</label>
+                            <button type="button" class="link-btn" id="addCategoryQuick">+ Kategori Baru</button>
+                        </div>
+                        <div class="category-grid" id="categoryGrid"></div>
+                        <input type="hidden" id="category" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Catatan (Opsional)</label>
+                        <input type="text" id="description" class="form-input" placeholder="Contoh: Makan siang di kantin">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Tanggal</label>
+                        <input type="date" id="date" class="form-input" required>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== SAVINGS MODAL ===== -->
+        <div class="modal" id="savingsModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3 id="savingsModalTitle">Target Tabungan</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="savingsForm" class="modal-body">
+                    <input type="hidden" id="savingsId">
+                    <div class="form-group">
+                        <label for="savingsName">Nama Target</label>
+                        <input type="text" id="savingsName" class="form-input" placeholder="Contoh: Liburan ke Bali" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="savingsTarget">Target Jumlah</label>
+                        <div class="input-prefix">
+                            <span class="input-prefix-label" id="savingsTargetPrefix">Rp</span>
+                            <input type="text" id="savingsTarget" class="form-input has-prefix" placeholder="0" inputmode="numeric" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="savingsCurrent">Jumlah Terkumpul</label>
+                        <div class="input-prefix">
+                            <span class="input-prefix-label" id="savingsCurrentPrefix">Rp</span>
+                            <input type="text" id="savingsCurrent" class="form-input has-prefix" placeholder="0" inputmode="numeric" value="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="savingsDeadline">Target Tanggal (Opsional)</label>
+                        <input type="date" id="savingsDeadline" class="form-input">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== ADD AMOUNT MODAL ===== -->
+        <div class="modal" id="addAmountModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-small">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Tambah ke Tabungan</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="addAmountForm" class="modal-body">
+                    <input type="hidden" id="addAmountGoalId">
+                    <p class="modal-description">Berapa yang ingin kamu tabung?</p>
+                    <div class="amount-display">
+                        <span class="amount-currency" id="addAmountCurrency">Rp</span>
+                        <input type="text" id="addAmountValue" class="amount-input" placeholder="0" inputmode="numeric" required>
+                    </div>
+                    <div class="quick-amounts">
+                        <button type="button" class="quick-btn" data-amount="50000">50rb</button>
+                        <button type="button" class="quick-btn" data-amount="100000">100rb</button>
+                        <button type="button" class="quick-btn" data-amount="500000">500rb</button>
+                        <button type="button" class="quick-btn" data-amount="1000000">1jt</button>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== BUDGET MODAL ===== -->
+        <div class="modal" id="budgetModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3 id="budgetModalTitle">Atur Budget</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="budgetForm" class="modal-body">
+                    <input type="hidden" id="budgetId">
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="budgetCategory" class="form-input" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetAmount">Limit Budget per Bulan</label>
+                        <div class="input-prefix">
+                            <span class="input-prefix-label" id="budgetPrefix">Rp</span>
+                            <input type="text" id="budgetAmount" class="form-input has-prefix" placeholder="0" inputmode="numeric" required>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY MANAGER MODAL ===== -->
+        <div class="modal" id="categoryManagerModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Kelola Kategori</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-selector-mini">
+                        <button class="tab-mini active" data-cat-type="expense">Pengeluaran</button>
+                        <button class="tab-mini" data-cat-type="income">Pemasukan</button>
+                    </div>
+                    <div class="category-list-manage" id="categoryListManage"></div>
+                    <button class="btn btn-primary" id="addNewCategoryBtn" style="margin-top: 16px;">
+                        <i class="fas fa-plus"></i> Tambah Kategori
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CATEGORY EDITOR MODAL ===== -->
+        <div class="modal" id="categoryEditorModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-small">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3 id="categoryEditorTitle">Kategori Baru</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="categoryForm" class="modal-body">
+                    <input type="hidden" id="catEditId">
+                    <input type="hidden" id="catEditType">
+                    <div class="form-group">
+                        <label for="catName">Nama Kategori</label>
+                        <input type="text" id="catName" class="form-input" placeholder="Contoh: Kopi" required maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <div class="icon-picker" id="iconPicker"></div>
+                        <input type="hidden" id="catIcon" value="fa-circle">
+                    </div>
+                    <div class="form-group">
+                        <label>Warna</label>
+                        <div class="color-picker" id="colorPicker"></div>
+                        <input type="hidden" id="catColor" value="#6366f1">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== BACKGROUND PICKER MODAL ===== -->
+        <div class="modal" id="backgroundModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Ganti Background Header</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="section-mini-title">Preset Gradient</h4>
+                    <div class="preset-grid" id="presetGrid"></div>
+
+                    <h4 class="section-mini-title">Upload Foto Sendiri</h4>
+                    <label class="upload-area" for="bgUploadInput">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Klik untuk pilih foto</span>
+                        <small>JPG, PNG (max 2MB)</small>
+                        <input type="file" id="bgUploadInput" accept="image/*" style="display:none">
+                    </label>
+
+                    <div class="bg-actions">
+                        <button class="btn btn-secondary" id="removeBgBtn">
+                            <i class="fas fa-undo"></i> Reset ke Default
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <!-- ===== CALCULATOR MODAL ===== -->
+        <div class="modal" id="calculatorModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-small">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Kalkulator</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body calc-body">
+                    <div class="calc-display">
+                        <div class="calc-expression" id="calcExpression"></div>
+                        <div class="calc-result" id="calcResult">0</div>
+                    </div>
+                    <div class="calc-buttons">
+                        <button class="calc-btn function" data-action="clear">C</button>
+                        <button class="calc-btn function" data-action="backspace">⌫</button>
+                        <button class="calc-btn function" data-action="percent">%</button>
+                        <button class="calc-btn operator" data-op="/">÷</button>
+                        
+                        <button class="calc-btn" data-num="7">7</button>
+                        <button class="calc-btn" data-num="8">8</button>
+                        <button class="calc-btn" data-num="9">9</button>
+                        <button class="calc-btn operator" data-op="*">×</button>
+                        
+                        <button class="calc-btn" data-num="4">4</button>
+                        <button class="calc-btn" data-num="5">5</button>
+                        <button class="calc-btn" data-num="6">6</button>
+                        <button class="calc-btn operator" data-op="-">−</button>
+                        
+                        <button class="calc-btn" data-num="1">1</button>
+                        <button class="calc-btn" data-num="2">2</button>
+                        <button class="calc-btn" data-num="3">3</button>
+                        <button class="calc-btn operator" data-op="+">+</button>
+                        
+                        <button class="calc-btn calc-zero" data-num="0">0</button>
+                        <button class="calc-btn" data-num=".">.</button>
+                        <button class="calc-btn equals" data-action="equals">=</button>
+                    </div>
+                    
+                    <!-- Tombol ini diubah dari .btn menjadi .calc-use-btn -->
+                    <button class="calc-use-btn" id="useCalcResult">
+                        <i class="fas fa-arrow-right"></i> Gunakan Hasil
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ABOUT MODAL ===== -->
+        <div class="modal" id="aboutModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Tentang DompetKu</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body about-body">
+                    <div class="about-logo">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3>DompetKu v2.0</h3>
+                    <p class="about-version">Aplikasi catatan keuangan pribadi</p>
+                    <div class="about-info">
+                        <div class="about-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <strong>100% Privat</strong>
+                                <p>Semua data tersimpan di perangkat Anda</p>
+                            </div>
+                        </div>
+                        <div class="about-item">
+                            <i class="fas fa-wifi"></i>
+                            <div>
+                                <strong>Offline First</strong>
+                                <p>Bekerja tanpa koneksi internet</p>
+                            </div>
+                        </div>
+                        <div class="about-item">
+                            <i class="fas fa-heart"></i>
+                            <div>
+                                <strong>Dibuat dengan ❤️</strong>
+                                <p>Untuk membantu keuangan Anda</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="about-footer">© 2024 DompetKu</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HELP MODAL ===== -->
+        <div class="modal" id="helpModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Bantuan</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body help-body">
+                    <div class="help-item">
+                        <div class="help-number">1</div>
+                        <div>
+                            <strong>Cara Menambah Transaksi</strong>
+                            <p>Tekan tombol <i class="fas fa-plus"></i> di kanan bawah, pilih Pemasukan atau Pengeluaran, isi detail, lalu simpan.</p>
+                        </div>
+                    </div>
+                    <div class="help-item">
+                        <div class="help-number">2</div>
+                        <div>
+                            <strong>Cara Mengubah Background</strong>
+                            <p>Buka Profil → Ganti Background Header. Pilih preset atau upload foto sendiri.</p>
+                        </div>
+                    </div>
+                    <div class="help-item">
+                        <div class="help-number">3</div>
+                        <div>
+                            <strong>Cara Membuat Budget</strong>
+                            <p>Buka menu Budget, tekan tombol +, pilih kategori dan tetapkan limit bulanan.</p>
+                        </div>
+                    </div>
+                    <div class="help-item">
+                        <div class="help-number">4</div>
+                        <div>
+                            <strong>Cara Menabung</strong>
+                            <p>Buka menu Tabungan, buat target, lalu tekan "Tambah Tabungan" setiap kali menyisihkan uang.</p>
+                        </div>
+                    </div>
+                    <div class="help-item">
+                        <div class="help-number">5</div>
+                        <div>
+                            <strong>Backup Data</strong>
+                            <p>Profil → Backup Data (JSON). Simpan file untuk restore nanti jika ganti HP.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== NAME EDIT MODAL ===== -->
+        <div class="modal" id="nameEditModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-small">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3>Edit Nama</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="nameEditForm" class="modal-body">
+                    <div class="form-group">
+                        <label for="userNameInput">Nama Anda</label>
+                        <input type="text" id="userNameInput" class="form-input" placeholder="Masukkan nama" maxlength="30" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== CONFIRM MODAL ===== -->
+        <div class="modal" id="confirmModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-small">
+                <div class="modal-body confirm-body">
+                    <div class="confirm-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 id="confirmTitle">Konfirmasi</h3>
+                    <p id="confirmMessage">Apakah Anda yakin?</p>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="confirmCancel">Batal</button>
+                        <button type="button" class="btn btn-danger" id="confirmOk">Ya, Lanjutkan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PROMPT MODAL ===== -->
+        <div class="modal" id="promptModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-small">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <h3 id="promptTitle">Input</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="promptInput" class="form-input" placeholder="Masukkan nilai">
+                    <div class="modal-actions" style="margin-top: 16px;">
+                        <button type="button" class="btn btn-secondary modal-cancel">Batal</button>
+                        <button type="button" class="btn btn-primary" id="promptOk">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOAST ===== -->
+        <div class="toast" id="toast">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+        <script>
+        // Mendaftarkan Service Worker untuk PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker aktif!'))
+                    .catch(err => console.log('Service Worker gagal:', err));
+            });
+        }
+    </script>
+</body>
+</html>
